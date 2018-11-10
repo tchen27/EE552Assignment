@@ -1,0 +1,176 @@
+package EE552;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import javax.swing.*;
+import javax.swing.text.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+/**
+ *
+ * @author chentao
+ */
+public class TextEditor extends JFrame  {
+    JTextPane textPane = new JTextPane();
+    JLabel statusBar = new JLabel();
+    JFileChooser filechooser = new JFileChooser();
+
+    public TextEditor() {
+        super("Test Menus");
+        setSize(800,600);
+        Action[] actions ={
+                new NewAction(),
+                new SaveAction(),
+                new OpenAction(),
+                new CutAction(),
+                new PasteAction(),
+                new RunAction(),
+                new ExitAction()};
+        setJMenuBar(createJMenuBar(actions));
+        Container container = getContentPane();
+        container.add(createJToolBar(actions), BorderLayout.NORTH);
+        container.add(textPane, BorderLayout.CENTER);
+        container.add(statusBar, BorderLayout.SOUTH);
+        setVisible(true);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+
+    private JMenuBar createJMenuBar(Action[] actions) {
+        JMenuBar menubar = new JMenuBar();
+        JMenu menuFile = new JMenu("File");
+        JMenu menuBuild = new JMenu("Compile");
+        menuFile.add(new JMenuItem(actions[0]));
+        menuFile.add(new JMenuItem(actions[1]));
+        menuFile.add(new JMenuItem(actions[2]));
+        menuFile.add(new JMenuItem(actions[6]));
+        menuBuild.add(new JMenuItem(actions[3]));
+        menuBuild.add(new JMenuItem(actions[4]));
+        menuBuild.add(new JMenuItem(actions[5]));
+        menubar.add(menuFile);
+        menubar.add(menuBuild);
+        return menubar;
+    }
+
+    private JToolBar createJToolBar(Action[] actions) {
+        JToolBar toolBar = new JToolBar();
+        for (int i = 0; i < actions.length; i++) {
+            JButton bt = new JButton(actions[i]);
+            bt.setRequestFocusEnabled(false);
+            toolBar.add(bt);
+        }
+        return toolBar;
+    }
+
+    class NewAction extends AbstractAction {
+        public NewAction() {
+            super("New");
+        }
+        public void actionPerformed(ActionEvent e) {
+            textPane.setDocument(new DefaultStyledDocument());
+        }
+    }
+
+    class OpenAction extends AbstractAction {
+        public OpenAction() {
+            super("Open");
+        }
+        public void actionPerformed(ActionEvent e) {
+            int i = filechooser.showOpenDialog(TextEditor.this);
+            if (i == JFileChooser.APPROVE_OPTION) {
+                File f = filechooser.getSelectedFile();
+                try {
+                    InputStream is = new FileInputStream(f);
+                    textPane.read(is, "d");
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+    }
+
+    class SaveAction extends AbstractAction {
+        public SaveAction() {
+            super("Save");
+        }
+        public void actionPerformed(ActionEvent e) {
+            int i = filechooser.showSaveDialog(TextEditor.this);
+            if (i == JFileChooser.APPROVE_OPTION) {
+                File f = filechooser.getSelectedFile();
+                try {
+                    FileOutputStream out = new FileOutputStream(f);
+                    out.write(textPane.getText().getBytes());
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }
+    }
+
+    class ExitAction extends AbstractAction {
+        public ExitAction() {
+            super("Exit");
+        }
+        public void actionPerformed(ActionEvent e) {
+            System.exit(0);
+        }
+    }
+
+    class CutAction extends AbstractAction {
+        public CutAction() {
+            super("Cut");
+        }
+        public void actionPerformed(ActionEvent e) {
+            textPane.cut();
+        }
+    }
+
+    class CopyAction extends AbstractAction {
+        public CopyAction() {
+            super("Copy");
+        }
+        public void actionPerformed(ActionEvent e) {
+            textPane.copy();
+        }
+    }
+
+    class PasteAction extends AbstractAction {
+        public PasteAction() {
+            super("Paste");
+        }
+        public void actionPerformed(ActionEvent e) {
+            textPane.paste();
+        }
+    }
+
+    class RunAction extends AbstractAction {
+        public RunAction() {
+            super("Run");
+        }
+        public void actionPerformed(ActionEvent e) {
+        }
+    }
+
+
+    public static void main(String[] args) {
+        new TextEditor();
+        Long timeStamp = System.currentTimeMillis();
+        SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String sd = sdf.format(new Date(Long.parseLong(String.valueOf(timeStamp))));
+        System.out.println("time result：" + sd);
+        Pattern p = Pattern.compile("(class|interface)\\s+([a-zA-Z_][0-9A-Za-z_\\$]+)");
+        try {
+            BufferedReader br = new BufferedReader(new FileReader("TestJava.java"));
+            String line;
+            while  ((line = br.readLine()) != null) {
+                Matcher m = p.matcher(line);
+                if (m.matches()) {
+                    System.out.println(m.start() + "," + m.end());
+                    System.out.println(m.group(2));
+                }
+            }
+        } catch(Exception e) {
+            System.out.println("Sorry, can't do it!");
+            e.printStackTrace();
+        }
+    }
+}

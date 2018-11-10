@@ -1,0 +1,32 @@
+package EE552;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.*;
+/**
+ *
+ * @author TaoChen
+ *
+ */
+public class FindCommon {
+    public static void main(String[] args) throws IOException{
+        String[] word = new String[]{"and","or","but","yes","no"};
+        BufferedReader br = new BufferedReader(new FileReader("Frankenstein.txt"));
+        Scanner sc = new Scanner(new File(br));
+        HashMap<String,Integer> hm = new HashMap<>();
+        Set<String> s = new HashSet<>(Arrays.asList(word));
+        while (sc.hasNext()){
+            String line = sc.nextLine();
+            String[] a = line.split(" ");
+            for (int i = 0; i < a.length; i++){
+                if (s.contains(a[i])){
+                    hm.put(a[i-1],hm.getOrDefault(a[i-1],0)+1);
+                }
+            }
+        }
+        for (hm.Entry<String,Integer> en: hm.entrySet()){
+        System.out.print(String.format("%-5s\n",en.getKey(),en.getValue()));
+        }
+    }
+}
